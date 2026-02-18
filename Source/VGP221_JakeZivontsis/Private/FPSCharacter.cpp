@@ -5,6 +5,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SpotLightComponent.h"
+#include "FPSHUDWidget.h"
+#include "Blueprint/UserWidget.h"  // <--- Allows to use CreateWidget()
+#include "Kismet/GameplayStatics.h" // <--- Allows to use OpenLevel()
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -33,14 +36,31 @@ void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-    // Add Input Mapping Context
     if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
     {
+        // Add Input Mapping Context
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
             Subsystem->AddMappingContext(DefaultMappingContext, 0);
         }
+
+        // Create the widget and save the reference
+        // Create a TSubclassOf<UUserWidget> property to assign WBP_GameHUD in the editor
+        if (HUDWidgetClass)
+        {
+            MyHUD = CreateWidget<UFPSHUDWidget>(PlayerController, HUDWidgetClass);
+            if (MyHUD)
+            {
+                MyHUD->AddToViewport();
+                MyHUD->UpdateHealth(Health, MaxHealth); // Set initial state
+                MyHUD->UpdateAmmo(CurrentClipAmmo, MaxReserveAmmo);
+            }
+        }
     }
+
+    // Initialize Stats
+    Health = MaxHealth;
+    CurrentClipAmmo = MaxClipSize;
 }
 
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -71,6 +91,22 @@ void AFPSCharacter::Fire()
 {
     if (ProjectileClass && GetWorld())
     {
+        // 1. Check Ammo
+        if (!CanFire())
+        {
+            // TODO: Play "Click" empty sound?
+            Reload(); // Auto-reload for convenience? Or just do nothing.
+            return;
+        }
+
+        // 2. Decrement Ammo
+        CurrentClipAmmo--;
+
+        if (MyHUD)
+        {
+            MyHUD->UpdateAmmo(CurrentClipAmmo, MaxReserveAmmo);
+        }
+
         FVector MuzzleLocation = GunMesh->GetSocketLocation(TEXT("Muzzle"));
         // If the mesh has no socket named Muzzle, it defaults to the mesh root
         if (GunMesh->DoesSocketExist(TEXT("Muzzle")) == false)
@@ -102,4 +138,75 @@ void AFPSCharacter::ToggleFlashlight()
     {
         FlashlightComp->ToggleVisibility();
     }
+}
+
+void AFPSCharacter::TakeDamageVS(float DamageAmount)
+{
+    Health -= DamageAmount;
+
+    if (Health <= 0.0f)
+    {
+        Health = 0.0f;
+        
+        UGameplayStatics::OpenLevel(GetWorld(), FName("LoseMenu"));
+
+        UE_LOG(LogTemp, Warning, TEXT("DEAD! Health: 0"));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Log, TEXT("Health: %f"), Health);
+    }
+
+    if (MyHUD)
+    {
+        MyHUD->UpdateHealth(Health, MaxHealth);
+    }
+}
+
+void AFPSCharacter::Heal(float HealAmount)
+{
+    Health += HealAmount;
+
+    // Clamp so we don't go over 100
+    if (Health > MaxHealth)
+    {
+        Health = MaxHealth;
+    }
+    UE_LOG(LogTemp, Log, TEXT("Healed! Health: %f"), Health);
+
+    if (MyHUD)
+    {
+        MyHUD->UpdateHealth(Health, MaxHealth);
+    }
+}
+
+void AFPSCharacter::Reload()
+{
+    // How much ammo do we need to fill the clip?
+    int32 AmmoNeeded = MaxClipSize - CurrentClipAmmo;
+
+    // Do we have enough in reserve?
+    if (MaxReserveAmmo >= AmmoNeeded)
+    {
+        MaxReserveAmmo -= AmmoNeeded;
+        CurrentClipAmmo = MaxClipSize;
+    }
+    else
+    {
+        // We don't have enough for a full reload, just put in what's left
+        CurrentClipAmmo += MaxReserveAmmo;
+        MaxReserveAmmo = 0;
+    }
+
+    UE_LOG(LogTemp, Log, TEXT("Reloaded! Clip: %d | Reserve: %d"), CurrentClipAmmo, MaxReserveAmmo);
+
+    if (MyHUD)
+    {
+        MyHUD->UpdateAmmo(CurrentClipAmmo, MaxReserveAmmo);
+    }
+}
+
+bool AFPSCharacter::CanFire() const
+{
+    return CurrentClipAmmo > 0;
 }

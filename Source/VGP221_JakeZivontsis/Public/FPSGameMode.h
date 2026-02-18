@@ -17,4 +17,21 @@ class VGP221_JAKEZIVONTSIS_API AFPSGameMode : public AGameModeBase
 
 	virtual void StartPlay() override;
 
+public:
+	// Total time allowed for the level (30 minutes = 1800 seconds)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Game Rules")
+	float LevelTimeLimit = 1800.0f;
+
+protected:
+	virtual void BeginPlay() override;
+
+	// The handle that manages the timer
+	FTimerHandle GameTimerHandle;
+
+	// The actual countdown variable
+	float TimeRemaining;
+
+	// Function called every second to decrement the timer
+	void UpdateTimer();
+
 };

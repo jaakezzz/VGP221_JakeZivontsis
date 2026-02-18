@@ -1,4 +1,5 @@
 #include "FPSProjectile.h"
+#include "FPSBaseEnemy.h"
 
 AFPSProjectile::AFPSProjectile()
 {
@@ -12,6 +13,12 @@ AFPSProjectile::AFPSProjectile()
 
     CollisionComp->OnComponentHit.AddDynamic(this, &AFPSProjectile::OnHit);
     RootComponent = CollisionComp;
+
+    // 1. Tell the projectile's collision component to BLOCK Pawns
+    CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+
+    // 2. Ensure Hit Events are enabled (usually true by default, but good to force)
+    CollisionComp->SetNotifyRigidBodyCollision(true);
 
     // Use a ProjectileMovementComponent to govern this projectile's movement
     ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
@@ -28,6 +35,12 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 {
     if ((OtherActor != nullptr) && (OtherActor != this))
     {
+        if (AFPSBaseEnemy* Enemy = Cast<AFPSBaseEnemy>(OtherActor))
+        {
+            Enemy->TakeEnemyDamage(25.0f); // Or whatever damage your bullet does
+            Destroy(); // Destroy the bullet on impact
+        }
+
         // Only push objects that are actually simulating physics (like crates/barrels)
         if (OtherComp && OtherComp->IsSimulatingPhysics())
         {
