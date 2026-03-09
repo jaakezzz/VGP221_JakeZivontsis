@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "FPSBaseEnemy.generated.h"
+class AAIController;
 
 UCLASS()
 class VGP221_JAKEZIVONTSIS_API AFPSBaseEnemy : public ACharacter
@@ -29,6 +30,20 @@ protected:
 	// Collision Function (When Player touches Enemy)
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// --- AI & Chase Variables ---
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	float ChaseDelay = 2.0f; // Seconds the player must look
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	float CurrentLookTime = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	bool bIsChasing = false;
+
+	// Reference to the controller that will pilot the enemy
+	UPROPERTY()
+	AAIController* EnemyAIController;
 
 private:
 	// Time (in seconds) when damage was last dealt
