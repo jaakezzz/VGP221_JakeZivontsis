@@ -35,3 +35,13 @@ void UFPSHUDWidget::UpdateTimerDisplay(float TimeRemaining)
     // 3. Set the text
     TimerText->SetText(FText::FromString(TimerString));
 }
+
+void UFPSHUDWidget::UpdateCollectibles(int32 CurrentCollectibles)
+{
+    if (CollectiblesText)
+    {
+        // Format the text to say something like "Score: 1"
+        FString ScoreString = FString::Printf(TEXT("Collectibles: %d"), CurrentCollectibles);
+        CollectiblesText->SetText(FText::FromString(ScoreString));
+    }
+}

@@ -22,6 +22,9 @@ public:
     // Function to format and display the time
     void UpdateTimerDisplay(float TimeRemaining);
 
+    UFUNCTION(BlueprintCallable, Category = "UI")
+    void UpdateCollectibles(int32 CurrentCollectibles);
+
 protected:
     // "BindWidget" tells Unreal: "Look for a component in the Blueprint named EXACTLY this."
     UPROPERTY(meta = (BindWidget))
@@ -32,4 +35,7 @@ protected:
 
     UPROPERTY(meta = (BindWidget))
     class UTextBlock* TimerText;
+
+    UPROPERTY(meta = (BindWidget))
+    class UTextBlock* CollectiblesText;
 };

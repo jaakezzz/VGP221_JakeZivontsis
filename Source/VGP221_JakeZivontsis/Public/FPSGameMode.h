@@ -22,14 +22,22 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Game Rules")
 	float LevelTimeLimit = 1800.0f;
 
+	// hold the high score across runs
+	UPROPERTY(BlueprintReadWrite, Category = "Game Data")
+	float HighScore = 0.0f;
+
+	// hold the score of the current run
+	UPROPERTY(BlueprintReadWrite, Category = "Game Data")
+	float CurrentScore = 0.0f;
+
+	// The actual countdown variable
+	float TimeRemaining;
+
 protected:
 	virtual void BeginPlay() override;
 
 	// The handle that manages the timer
 	FTimerHandle GameTimerHandle;
-
-	// The actual countdown variable
-	float TimeRemaining;
 
 	// Function called every second to decrement the timer
 	void UpdateTimer();

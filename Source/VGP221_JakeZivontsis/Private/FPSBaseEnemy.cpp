@@ -65,6 +65,12 @@ void AFPSBaseEnemy::TakeEnemyDamage(float DamageAmount)
 
 	if (Health <= 0.0f)
 	{
+		// Find the player and give them credit for the kill
+		if (AFPSCharacter* Player = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)))
+		{
+			Player->AddEnemyKill();
+		}
+
 		Destroy();
 	}
 }

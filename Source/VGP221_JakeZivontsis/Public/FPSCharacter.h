@@ -54,6 +54,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
     UInputAction* FlashlightAction;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+    UInputAction* ReloadAction;
+
     // Projectile class to spawn
     UPROPERTY(EditDefaultsOnly, Category = Projectile)
     TSubclassOf<class AFPSProjectile> ProjectileClass;
@@ -87,10 +90,17 @@ public:
     int32 MaxClipSize = 7; // How many bullets in the gun
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-    int32 CurrentClipAmmo = 7; // Currently loaded
+    int32 CurrentClipAmmo = 0; // Currently loaded
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-    int32 MaxReserveAmmo = 1000; // The "Insane amount" you requested
+	int32 MaxReserveAmmo = 0; // Current ammo in reserve (not loaded)
+
+	// Score Tracking
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
+    int32 Collectibles = 0;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stats")
+    int32 EnemiesKilled = 0;
 
     // --- FUNCTIONS ---
 
@@ -102,6 +112,15 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Combat")
     void Reload();
+
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    void AddReserveAmmo(int32 AmmoAmount);
+
+    UFUNCTION(BlueprintCallable, Category = "Stats")
+    void AddCollectible();
+
+    UFUNCTION(BlueprintCallable, Category = "Stats")
+    void AddEnemyKill();
 
     // Check if we can fire (Do we have ammo?)
     bool CanFire() const;

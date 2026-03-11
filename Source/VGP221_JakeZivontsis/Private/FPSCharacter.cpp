@@ -52,15 +52,18 @@ void AFPSCharacter::BeginPlay()
             if (MyHUD)
             {
                 MyHUD->AddToViewport();
-                MyHUD->UpdateHealth(Health, MaxHealth); // Set initial state
+
+				// Set initial values on the HUD
+                MyHUD->UpdateHealth(Health, MaxHealth);
                 MyHUD->UpdateAmmo(CurrentClipAmmo, MaxReserveAmmo);
+                MyHUD->UpdateCollectibles(Collectibles);
             }
         }
     }
 
     // Initialize Stats
     Health = MaxHealth;
-    CurrentClipAmmo = MaxClipSize;
+    CurrentClipAmmo = 0;
 }
 
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -73,6 +76,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AFPSCharacter::Fire);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPSCharacter::Look);
         EnhancedInputComponent->BindAction(FlashlightAction, ETriggerEvent::Started, this, &AFPSCharacter::ToggleFlashlight);
+        EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &AFPSCharacter::Reload);
     }
 }
 
@@ -209,4 +213,33 @@ void AFPSCharacter::Reload()
 bool AFPSCharacter::CanFire() const
 {
     return CurrentClipAmmo > 0;
+}
+
+void AFPSCharacter::AddReserveAmmo(int32 AmmoAmount)
+{
+    MaxReserveAmmo += AmmoAmount;
+
+    // Refresh the HUD so the player sees the new ammo
+    if (MyHUD)
+    {
+        MyHUD->UpdateAmmo(CurrentClipAmmo, MaxReserveAmmo);
+    }
+    UE_LOG(LogTemp, Log, TEXT("Picked up ammo! Total Reserve: %d"), MaxReserveAmmo);
+}
+
+void AFPSCharacter::AddCollectible()
+{
+    Collectibles++;
+    UE_LOG(LogTemp, Log, TEXT("Collectibles Found: %d"), Collectibles);
+
+    if (MyHUD)
+    {
+        MyHUD->UpdateCollectibles(Collectibles);
+    }
+}
+
+void AFPSCharacter::AddEnemyKill()
+{
+    EnemiesKilled++;
+    UE_LOG(LogTemp, Log, TEXT("Enemy Killed! Total: %d"), EnemiesKilled);
 }
