@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class VGP221_JakeZivontsisEditorTarget : TargetRules
+public class MannequinChamberEditorTarget : TargetRules
 {
-	public VGP221_JakeZivontsisEditorTarget( TargetInfo Target) : base(Target)
+	public MannequinChamberEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_6;
-		ExtraModuleNames.Add("VGP221_JakeZivontsis");
+		ExtraModuleNames.Add("MannequinChamber");
 	}
 }

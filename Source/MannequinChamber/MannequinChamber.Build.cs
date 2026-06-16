@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class VGP221_JakeZivontsis : ModuleRules
+public class MannequinChamber : ModuleRules
 {
-	public VGP221_JakeZivontsis(ReadOnlyTargetRules Target) : base(Target)
+	public MannequinChamber(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
