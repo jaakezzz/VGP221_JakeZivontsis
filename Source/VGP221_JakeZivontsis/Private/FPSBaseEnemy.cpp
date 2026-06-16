@@ -109,7 +109,23 @@ void AFPSBaseEnemy::Tick(float DeltaTime)
 
 					if (LookDot >= ConeThreshold)
 					{
-						bIsBeingIlluminated = true;
+						// 3.5 Check Line of Sight (Is there a wall in the way?)
+						FHitResult HitResult;
+						FVector StartTrace = Flashlight->GetComponentLocation();
+						FVector EndTrace = GetActorLocation();
+
+						// Ignore the player so the trace doesn't get blocked by the player's own collision capsule
+						FCollisionQueryParams QueryParams;
+						QueryParams.AddIgnoredActor(Player);
+
+						// Fire a raycast looking for standard visibility collision
+						bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility, QueryParams);
+
+						// If the trace didn't hit anything, OR if the first thing it hit was this exact enemy...
+						if (!bHit || HitResult.GetActor() == this)
+						{
+							bIsBeingIlluminated = true;
+						}
 					}
 				}
 			}
