@@ -5,7 +5,7 @@
 #include "FPSAmmoPickup.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSAmmoPickup : public AFPSBasePickup
+class MANNEQUINCHAMBER_API AFPSAmmoPickup : public AFPSBasePickup
 {
 	GENERATED_BODY()
 

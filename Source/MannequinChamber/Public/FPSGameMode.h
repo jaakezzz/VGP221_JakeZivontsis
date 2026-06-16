@@ -10,7 +10,7 @@
  *
  */
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSGameMode : public AGameModeBase
+class MANNEQUINCHAMBER_API AFPSGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 

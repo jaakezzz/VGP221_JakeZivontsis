@@ -6,7 +6,7 @@
 #include "FPSBasePickup.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSBasePickup : public AActor
+class MANNEQUINCHAMBER_API AFPSBasePickup : public AActor
 {
 	GENERATED_BODY()
 

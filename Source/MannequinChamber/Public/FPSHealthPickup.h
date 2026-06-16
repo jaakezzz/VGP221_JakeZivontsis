@@ -5,7 +5,7 @@
 #include "FPSHealthPickup.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSHealthPickup : public AFPSBasePickup
+class MANNEQUINCHAMBER_API AFPSHealthPickup : public AFPSBasePickup
 {
 	GENERATED_BODY()
 

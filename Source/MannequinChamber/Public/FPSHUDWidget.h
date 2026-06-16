@@ -7,7 +7,7 @@
 #include "FPSHUDWidget.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API UFPSHUDWidget : public UUserWidget
+class MANNEQUINCHAMBER_API UFPSHUDWidget : public UUserWidget
 {
     GENERATED_BODY()
 

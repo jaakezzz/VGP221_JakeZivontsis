@@ -5,7 +5,7 @@
 #include "FPSGameInstance.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API UFPSGameInstance : public UGameInstance
+class MANNEQUINCHAMBER_API UFPSGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 

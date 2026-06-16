@@ -8,7 +8,7 @@
 class AAIController;
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSBaseEnemy : public ACharacter
+class MANNEQUINCHAMBER_API AFPSBaseEnemy : public ACharacter
 {
 	GENERATED_BODY()
 

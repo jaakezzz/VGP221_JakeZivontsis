@@ -5,7 +5,7 @@
 #include "FPSWinWidget.generated.h" 
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API UFPSWinWidget : public UUserWidget
+class MANNEQUINCHAMBER_API UFPSWinWidget : public UUserWidget
 {
     GENERATED_BODY()
 

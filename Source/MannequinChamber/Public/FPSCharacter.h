@@ -10,7 +10,7 @@ class UInputMappingContext;
 class UInputAction;
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSCharacter : public ACharacter
+class MANNEQUINCHAMBER_API AFPSCharacter : public ACharacter
 {
     GENERATED_BODY()
 

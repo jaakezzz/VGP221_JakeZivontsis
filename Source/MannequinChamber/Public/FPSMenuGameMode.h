@@ -5,7 +5,7 @@
 #include "FPSMenuGameMode.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSMenuGameMode : public AGameModeBase
+class MANNEQUINCHAMBER_API AFPSMenuGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 

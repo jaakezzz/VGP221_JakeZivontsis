@@ -7,7 +7,7 @@
 #include "FPSProjectile.generated.h"
 
 UCLASS()
-class VGP221_JAKEZIVONTSIS_API AFPSProjectile : public AActor // REPLACE 'YOURPROJECTNAME'
+class MANNEQUINCHAMBER_API AFPSProjectile : public AActor // REPLACE 'YOURPROJECTNAME'
 {
     GENERATED_BODY()
 
