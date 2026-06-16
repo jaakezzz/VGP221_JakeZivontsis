@@ -1,2 +1,2 @@
-# VGP221_JakeZivontsis
-Graphics Programming 2 project
+# Mannequin Chamber - C++ Unreal Engine
+A horror-shooter game made entirely with Unreal Engine C++
