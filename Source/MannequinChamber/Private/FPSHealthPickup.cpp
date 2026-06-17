@@ -1,7 +1,14 @@
 #include "FPSHealthPickup.h"
 
-void AFPSHealthPickup::OnPickup(AFPSCharacter* Player)
+bool AFPSHealthPickup::OnPickup(AFPSCharacter* Player)
 {
+    // If the player is at or above max health
+    if (Player->Health >= Player->MaxHealth)
+    {
+        return false;
+    }
+
+    // The player needs health
     Player->Heal(HealAmount);
-    Destroy();
+    return true;
 }

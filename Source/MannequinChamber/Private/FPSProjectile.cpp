@@ -1,5 +1,6 @@
 #include "FPSProjectile.h"
 #include "FPSBaseEnemy.h"
+#include "Kismet/GameplayStatics.h"
 
 AFPSProjectile::AFPSProjectile()
 {
@@ -35,6 +36,19 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 {
     if ((OtherActor != nullptr) && (OtherActor != this))
     {
+        // Play the impact sound in 3D space exactly where the bullet landed
+        if (ImpactSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+        }
+
+        // Play the impact particle effect (Scaled down)
+        if (ImpactParticles)
+        {
+            // Scale the explosion down to 15% of its original size. 
+            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorLocation(), Hit.ImpactNormal.Rotation(), FVector(0.083f));
+        }
+
         if (AFPSBaseEnemy* Enemy = Cast<AFPSBaseEnemy>(OtherActor))
         {
             Enemy->TakeEnemyDamage(25.0f); // Or whatever damage your bullet does

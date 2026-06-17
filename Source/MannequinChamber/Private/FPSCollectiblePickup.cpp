@@ -1,7 +1,7 @@
 #include "FPSCollectiblePickup.h"
 
-void AFPSCollectiblePickup::OnPickup(AFPSCharacter* Player)
+bool AFPSCollectiblePickup::OnPickup(AFPSCharacter* Player)
 {
     Player->AddCollectible();
-    Destroy();
+	return true;
 }

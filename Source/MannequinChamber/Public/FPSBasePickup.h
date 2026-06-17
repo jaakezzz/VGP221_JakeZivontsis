@@ -13,6 +13,10 @@ class MANNEQUINCHAMBER_API AFPSBasePickup : public AActor
 public:
 	AFPSBasePickup();
 
+	// --- AUDIO ---
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	class USoundBase* PickupSound;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -28,6 +32,6 @@ protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// Virtual function that our child classes will override
-	virtual void OnPickup(class AFPSCharacter* Player);
+	// Virtual function that returns TRUE if the item was successfully consumed
+	virtual bool OnPickup(class AFPSCharacter* Player);
 };

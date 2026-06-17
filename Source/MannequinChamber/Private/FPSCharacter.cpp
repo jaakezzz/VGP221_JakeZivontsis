@@ -98,12 +98,17 @@ void AFPSCharacter::Fire()
         // 1. Check Ammo
         if (!CanFire())
         {
-            // TODO: Play "Click" empty sound?
-            Reload(); // Auto-reload for convenience? Or just do nothing.
+            Reload(); // Auto-reload for convenience
             return;
         }
 
-        // 2. Decrement Ammo
+        // 2. Play Gunshot Sound
+        if (GunShotSound)
+        {
+            UGameplayStatics::PlaySound2D(this, GunShotSound);
+        }
+
+        // 3. Decrement Ammo
         CurrentClipAmmo--;
 
         if (MyHUD)
@@ -140,12 +145,25 @@ void AFPSCharacter::ToggleFlashlight()
 {
     if (FlashlightComp)
     {
+        if (FlashlightClickSound)
+        {
+            UGameplayStatics::PlaySound2D(this, FlashlightClickSound);
+        }
+
         FlashlightComp->ToggleVisibility();
     }
 }
 
 void AFPSCharacter::TakeDamageVS(float DamageAmount)
 {
+    // Play the hurt sound // Audio Cooldown Check
+    float CurrentTime = GetWorld()->GetTimeSeconds();
+    if (PlayerHurtSound && (CurrentTime - LastHurtSoundTime >= HurtSoundCooldown))
+    {
+        UGameplayStatics::PlaySound2D(this, PlayerHurtSound);
+        LastHurtSoundTime = CurrentTime; // Reset the clock
+    }
+
     Health -= DamageAmount;
 
     if (Health <= 0.0f)
@@ -169,6 +187,14 @@ void AFPSCharacter::TakeDamageVS(float DamageAmount)
 
 void AFPSCharacter::Heal(float HealAmount)
 {
+    // Play the heal sound // Audio Cooldown Check
+    float CurrentTime = GetWorld()->GetTimeSeconds();
+    if (PlayerHealSound && (CurrentTime - LastHealSoundTime >= HealSoundCooldown))
+    {
+        UGameplayStatics::PlaySound2D(this, PlayerHealSound);
+        LastHealSoundTime = CurrentTime;
+    }
+
     Health += HealAmount;
 
     // Clamp so we don't go over 100
@@ -186,10 +212,35 @@ void AFPSCharacter::Heal(float HealAmount)
 
 void AFPSCharacter::Reload()
 {
-    // How much ammo do we need to fill the clip?
+    // 1. Safety Check: Don't reload if we are already reloading, clip is full, or reserve is empty
+    if (bIsReloading || CurrentClipAmmo == MaxClipSize || MaxReserveAmmo <= 0)
+    {
+        return;
+    }
+
+    // 2. Lock the gun
+    bIsReloading = true;
+
+    // 3. Play the sound right as the reload starts
+    if (ReloadSound)
+    {
+        UGameplayStatics::PlaySound2D(this, ReloadSound);
+    }
+
+    // 4. Start the Timer! Call FinishReload() after 'ReloadTime' seconds have passed.
+    GetWorldTimerManager().SetTimer(ReloadTimerHandle, this, &AFPSCharacter::FinishReload, ReloadTime, false);
+
+    UE_LOG(LogTemp, Log, TEXT("Reloading..."));
+}
+
+void AFPSCharacter::FinishReload()
+{
+    // 1. Unlock the gun
+    bIsReloading = false;
+
+    // 2. Do the Ammo Math
     int32 AmmoNeeded = MaxClipSize - CurrentClipAmmo;
 
-    // Do we have enough in reserve?
     if (MaxReserveAmmo >= AmmoNeeded)
     {
         MaxReserveAmmo -= AmmoNeeded;
@@ -197,13 +248,13 @@ void AFPSCharacter::Reload()
     }
     else
     {
-        // We don't have enough for a full reload, just put in what's left
         CurrentClipAmmo += MaxReserveAmmo;
         MaxReserveAmmo = 0;
     }
 
-    UE_LOG(LogTemp, Log, TEXT("Reloaded! Clip: %d | Reserve: %d"), CurrentClipAmmo, MaxReserveAmmo);
+    UE_LOG(LogTemp, Log, TEXT("Reload Finished! Clip: %d | Reserve: %d"), CurrentClipAmmo, MaxReserveAmmo);
 
+    // 3. Update the UI
     if (MyHUD)
     {
         MyHUD->UpdateAmmo(CurrentClipAmmo, MaxReserveAmmo);
@@ -212,7 +263,7 @@ void AFPSCharacter::Reload()
 
 bool AFPSCharacter::CanFire() const
 {
-    return CurrentClipAmmo > 0;
+    return CurrentClipAmmo > 0 && !bIsReloading;
 }
 
 void AFPSCharacter::AddReserveAmmo(int32 AmmoAmount)

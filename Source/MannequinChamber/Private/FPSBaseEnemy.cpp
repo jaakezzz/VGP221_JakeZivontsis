@@ -2,6 +2,7 @@
 
 
 #include "FPSBaseEnemy.h"
+#include "FPSGameMode.h"
 #include "Components/CapsuleComponent.h"
 #include "FPSCharacter.h" // Needed to damage the player
 #include "AIController.h"
@@ -34,6 +35,9 @@ void AFPSBaseEnemy::BeginPlay()
 
 void AFPSBaseEnemy::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	// GATE: Dead enemies don't bite
+	if (bIsDead) return;
+
 	if (OtherActor && (OtherActor != this))
 	{
 		// Check if the thing that bumped into us is the Player
@@ -61,17 +65,64 @@ void AFPSBaseEnemy::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 void AFPSBaseEnemy::TakeEnemyDamage(float DamageAmount)
 {
+	// GATE: Don't take damage if already dead (prevents shooting corpses to trigger sounds/score twice)
+	if (bIsDead) return;
+
 	Health -= DamageAmount;
 
 	if (Health <= 0.0f)
 	{
-		// Find the player and give them credit for the kill
+		// 1. Lock the state
+		bIsDead = true;
+
+		// 2. Play the Death sound
+		if (EnemyDeathSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, EnemyDeathSound, GetActorLocation());
+		}
+
+		// 3. Find the player and give them credit for the kill
 		if (AFPSCharacter* Player = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)))
 		{
 			Player->AddEnemyKill();
 		}
 
-		Destroy();
+		// 4. If this enemy dies while chasing, drop the global aggro count
+		if (bIsChasing)
+		{
+			if (AFPSGameMode* GameMode = Cast<AFPSGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+			{
+				GameMode->ReportChaseEnded();
+			}
+		}
+
+		// 5. Stop the AI Brain
+		if (EnemyAIController)
+		{
+			EnemyAIController->StopMovement();
+		}
+
+		// 6. Ragdoll Physics
+		//Turn off the invisible capsule so the player can walk right through the body
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		//Switch the visible mesh to the built-in Ragdoll profile and turn on gravity/physics
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetSimulatePhysics(true);
+
+		// 7. Cleanup
+		//automatically delete this Actor in 10 seconds to save memory
+		SetLifeSpan(10.0f);
+	}
+	else
+	{
+		// If they survived the hit and actively chasing, play the 3D pain sound // Audio Cooldown Check
+		float CurrentTime = GetWorld()->GetTimeSeconds();
+		if (bIsChasing && EnemyHurtSound && (CurrentTime - LastHurtSoundTime >= HurtSoundCooldown))
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, EnemyHurtSound, GetActorLocation());
+			LastHurtSoundTime = CurrentTime;
+		}
 	}
 }
 
@@ -79,6 +130,9 @@ void AFPSBaseEnemy::TakeEnemyDamage(float DamageAmount)
 void AFPSBaseEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// GATE: Dead enemies don't think
+	if (bIsDead) return;
 
 	// Get the player
 	AFPSCharacter* Player = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
@@ -139,6 +193,12 @@ void AFPSBaseEnemy::Tick(float DeltaTime)
 			if (CurrentLookTime >= ChaseDelay)
 			{
 				bIsChasing = true; // Trigger the chase!
+				
+				// Tell the GameMode
+				if (AFPSGameMode* GameMode = Cast<AFPSGameMode>(UGameplayStatics::GetGameMode(GetWorld())))
+				{
+					GameMode->ReportChaseStarted();
+				}
 			}
 		}
 		else

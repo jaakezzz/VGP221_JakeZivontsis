@@ -4,7 +4,7 @@
 #include "FPSGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
-void AFPSWinPickup::OnPickup(AFPSCharacter* Player)
+bool AFPSWinPickup::OnPickup(AFPSCharacter* Player)
 {
     if (Player)
     {
@@ -42,6 +42,8 @@ void AFPSWinPickup::OnPickup(AFPSCharacter* Player)
 
         // 5. Load the Win Menu
         UGameplayStatics::OpenLevel(GetWorld(), FName("WinMenu"));
-        Destroy();
+        return true;
     }
+
+    return false;
 }

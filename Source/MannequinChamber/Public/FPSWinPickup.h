@@ -10,5 +10,5 @@ class MANNEQUINCHAMBER_API AFPSWinPickup : public AFPSBasePickup
 	GENERATED_BODY()
 	
 protected:
-	virtual void OnPickup(class AFPSCharacter* Player) override;
+	virtual bool OnPickup(class AFPSCharacter* Player) override;
 };

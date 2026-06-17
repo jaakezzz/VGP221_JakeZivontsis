@@ -1,6 +1,7 @@
 #include "FPSBasePickup.h"
 #include "Components/SphereComponent.h"
 #include "FPSCharacter.h"
+#include "Kismet/GameplayStatics.h"
 
 AFPSBasePickup::AFPSBasePickup()
 {
@@ -28,13 +29,22 @@ void AFPSBasePickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 	{
 		if (AFPSCharacter* Player = Cast<AFPSCharacter>(OtherActor))
 		{
-			// Call the virtual function
-			OnPickup(Player);
+			// If the child class successfully gets picked up
+			if (OnPickup(Player))
+			{
+				// Play the sound
+				if (PickupSound)
+				{
+					UGameplayStatics::PlaySound2D(this, PickupSound);
+				}
+				Destroy();
+			}
 		}
 	}
 }
 
-void AFPSBasePickup::OnPickup(AFPSCharacter* Player)
+// Default base behavior just in case
+bool AFPSBasePickup::OnPickup(AFPSCharacter* Player)
 {
-	// virtual function to be overridden by child classes
+	return false;
 }

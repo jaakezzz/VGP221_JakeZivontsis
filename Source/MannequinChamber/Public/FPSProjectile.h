@@ -22,4 +22,12 @@ public:
 
     UFUNCTION()
     void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+    // --- AUDIO ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundBase* ImpactSound;
+
+    // --- VISUAL EFFECTS ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+    class UParticleSystem* ImpactParticles;
 };

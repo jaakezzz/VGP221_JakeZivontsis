@@ -10,10 +10,21 @@ class MANNEQUINCHAMBER_API AFPSMenuGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	AFPSMenuGameMode();
 
 	// 1. The specific widget class to show
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> MenuWidgetClass;
+
+	// --- AUDIO ---
+
+	// The looping background track for the menu
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio")
+	class UAudioComponent* MenuMusicComponent;
+
+	// The one-shot sound to play the instant the menu opens (Win/Lose stingers)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Audio")
+	class USoundBase* LevelStartStinger;
 
 	UFUNCTION()
 	void HandlePlayButtonClicked();

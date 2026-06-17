@@ -14,5 +14,5 @@ public:
 	float HealAmount = 25.0f;
 
 protected:
-	virtual void OnPickup(class AFPSCharacter* Player) override;
+	virtual bool OnPickup(class AFPSCharacter* Player) override;
 };

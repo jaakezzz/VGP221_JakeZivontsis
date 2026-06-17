@@ -6,11 +6,28 @@
 #include "Kismet/KismetSystemLibrary.h" // Needed for the Quit function
 #include "Kismet/GameplayStatics.h" // Needed for OpenLevel
 #include "Components/Button.h"         // Needed to talk to the Button class
+#include "Components/AudioComponent.h"
 
+
+AFPSMenuGameMode::AFPSMenuGameMode()
+{
+	// Create the background music component
+	MenuMusicComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MenuMusicComponent"));
+
+	// Ensure it plays (2D)
+	MenuMusicComponent->bAllowSpatialization = false;
+}
 
 void AFPSMenuGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// --- AUDIO ---
+	// If a one-shot stinger was assigned in the Blueprint, play it immediately
+	if (LevelStartStinger)
+	{
+		UGameplayStatics::PlaySound2D(this, LevelStartStinger);
+	}
 
 	// 1. Check if the blueprint has been assigned
 	if (MenuWidgetClass)

@@ -14,5 +14,5 @@ public:
 	int32 AmmoAmount = 30;
 
 protected:
-	virtual void OnPickup(class AFPSCharacter* Player) override;
+	virtual bool OnPickup(class AFPSCharacter* Player) override;
 };

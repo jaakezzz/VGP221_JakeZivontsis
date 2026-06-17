@@ -21,6 +21,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	// Health and Combat Variables
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bIsDead = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float Health = 250.0f;
 
@@ -30,6 +33,16 @@ protected:
 	// Collision Function (When Player touches Enemy)
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	// --- AUDIO ---
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundBase* EnemyHurtSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	float HurtSoundCooldown = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	USoundBase* EnemyDeathSound;
 
 	// --- AI & Chase Variables ---
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
@@ -51,6 +64,9 @@ private:
 
 	// How often (in seconds) the enemy can deal damage
 	float DamageCooldown = 0.25f;
+
+	// Timestamp for audio gating
+	float LastHurtSoundTime = -100.0f;
 
 public:	
 	// Called every frame

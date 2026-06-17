@@ -4,7 +4,17 @@
 #include "FPSCharacter.h"
 #include "FPSHUDWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 // #include "TimerManager.h"
+
+AFPSGameMode::AFPSGameMode()
+{
+    // Create the background music component
+    MusicComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicComponent"));
+
+    // We want the music 2D, not physically sitting in the level
+    MusicComponent->bAllowSpatialization = false;
+}
 
 void AFPSGameMode::StartPlay()
 {
@@ -68,5 +78,44 @@ void AFPSGameMode::UpdateTimer()
 
         // Load the Lose Menu
         UGameplayStatics::OpenLevel(GetWorld(), FName("LoseMenu"));
+    }
+}
+
+void AFPSGameMode::ReportChaseStarted()
+{
+    ActiveChasers++;
+
+    // 1. Handle the Music State
+    if (MusicComponent && ActiveChasers == 1)
+    {
+        // Tell the MetaSound to restart the chase track from the beginning
+        MusicComponent->SetTriggerParameter(FName("StartChase"));
+
+        // Tell the MetaSound to crossfade the volume
+        MusicComponent->SetFloatParameter(FName("Intensity"), 1.0f);
+    }
+
+    // 2. Handle the Stinger Cooldown
+    float CurrentTime = GetWorld()->GetTimeSeconds();
+    if (ChaseStinger && (CurrentTime - LastStingerTime >= StingerCooldown))
+    {
+        UGameplayStatics::PlaySound2D(GetWorld(), ChaseStinger);
+        LastStingerTime = CurrentTime;
+    }
+}
+
+void AFPSGameMode::ReportChaseEnded()
+{
+    ActiveChasers--;
+
+    if (ActiveChasers <= 0)
+    {
+        ActiveChasers = 0; // Safety clamp
+
+        // All enemies are dead or lost us. Transition back to Idle Music!
+        if (MusicComponent)
+        {
+            MusicComponent->SetFloatParameter(FName("Intensity"), 0.0f);
+        }
     }
 }
