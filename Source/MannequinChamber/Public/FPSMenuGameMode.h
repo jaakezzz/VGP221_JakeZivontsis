@@ -16,6 +16,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> MenuWidgetClass;
 
+
 	// --- AUDIO ---
 
 	// The looping background track for the menu

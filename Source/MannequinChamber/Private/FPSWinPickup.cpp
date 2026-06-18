@@ -3,6 +3,7 @@
 #include "FPSGameMode.h"
 #include "FPSGameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "FPSGameInstance.h"
 
 bool AFPSWinPickup::OnPickup(AFPSCharacter* Player)
 {
@@ -41,7 +42,12 @@ bool AFPSWinPickup::OnPickup(AFPSCharacter* Player)
         }
 
         // 5. Load the Win Menu
-        UGameplayStatics::OpenLevel(GetWorld(), FName("WinMenu"));
+        // Ask the GameInstance for the Win Map
+        if (!GameInst->WinMenuLevel.IsNull())
+        {
+            UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInst->WinMenuLevel);
+        }
+
         return true;
     }
 

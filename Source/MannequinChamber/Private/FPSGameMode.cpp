@@ -5,6 +5,7 @@
 #include "FPSHUDWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "FPSGameInstance.h"
 // #include "TimerManager.h"
 
 AFPSGameMode::AFPSGameMode()
@@ -76,8 +77,14 @@ void AFPSGameMode::UpdateTimer()
         // Stop the timer from running further
         GetWorldTimerManager().ClearTimer(GameTimerHandle);
 
-        // Load the Lose Menu
-        UGameplayStatics::OpenLevel(GetWorld(), FName("LoseMenu"));
+        // Ask the GameInstance for the Lose Map
+        if (UFPSGameInstance* GameInst = Cast<UFPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+        {
+            if (!GameInst->LoseMenuLevel.IsNull())
+            {
+                UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInst->LoseMenuLevel);
+            }
+        }
     }
 }
 

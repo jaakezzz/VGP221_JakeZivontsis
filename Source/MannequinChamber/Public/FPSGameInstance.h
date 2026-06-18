@@ -26,4 +26,17 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Game Data")
 	float RunTime = 0.0f;
+
+	// --- GLOBAL MAP REFERENCES (Single Source of Truth) ---
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Transitions")
+	TSoftObjectPtr<UWorld> MainMenuLevel;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Transitions")
+	TSoftObjectPtr<UWorld> GameplayLevel;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Transitions")
+	TSoftObjectPtr<UWorld> WinMenuLevel;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Transitions")
+	TSoftObjectPtr<UWorld> LoseMenuLevel;
 };

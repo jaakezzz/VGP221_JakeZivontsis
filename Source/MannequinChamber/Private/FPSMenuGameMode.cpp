@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h" // Needed for OpenLevel
 #include "Components/Button.h"         // Needed to talk to the Button class
 #include "Components/AudioComponent.h"
+#include "FPSGameInstance.h" // Needed to access the GameInstance for level references
 
 
 AFPSMenuGameMode::AFPSMenuGameMode()
@@ -78,13 +79,34 @@ void AFPSMenuGameMode::BeginPlay()
 
 void AFPSMenuGameMode::HandlePlayButtonClicked()
 {
-	// Load the gameplay level by name
-	UGameplayStatics::OpenLevel(GetWorld(), FName("MainMap"));
+	// Ask the GameInstance for the Gameplay Map
+	if (UFPSGameInstance* GameInst = Cast<UFPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+	{
+		if (!GameInst->GameplayLevel.IsNull())
+		{
+			UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInst->GameplayLevel);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Gameplay Level is not assigned in the GameInstance Blueprint"));
+		}
+	}
 }
 
 void AFPSMenuGameMode::HandleMenuButtonClicked()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("MainMenu"));
+	// Ask the GameInstance for the Main Menu Map
+	if (UFPSGameInstance* GameInst = Cast<UFPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+	{
+		if (!GameInst->MainMenuLevel.IsNull())
+		{
+			UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInst->MainMenuLevel);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Main Menu is not assigned in the GameInstance Blueprint"));
+		}
+	}
 }
 
 void AFPSMenuGameMode::HandleQuitButtonClicked()

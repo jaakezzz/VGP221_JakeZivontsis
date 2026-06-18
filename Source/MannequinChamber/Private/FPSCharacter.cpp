@@ -7,7 +7,8 @@
 #include "Components/SpotLightComponent.h"
 #include "FPSHUDWidget.h"
 #include "Blueprint/UserWidget.h"  // <--- Allows to use CreateWidget()
-#include "Kismet/GameplayStatics.h" // <--- Allows to use OpenLevel()
+#include "Kismet/GameplayStatics.h" // <--- Allows to use OpenLevel() // no longer used
+#include "FPSGameInstance.h" // <--- Allows access to the GameInstance for level references
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -170,7 +171,14 @@ void AFPSCharacter::TakeDamageVS(float DamageAmount)
     {
         Health = 0.0f;
         
-        UGameplayStatics::OpenLevel(GetWorld(), FName("LoseMenu"));
+        // Ask the GameInstance for the Lose Map
+        if (UFPSGameInstance* GameInst = Cast<UFPSGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+        {
+            if (!GameInst->LoseMenuLevel.IsNull())
+            {
+                UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInst->LoseMenuLevel);
+            }
+        }
 
         UE_LOG(LogTemp, Warning, TEXT("DEAD! Health: 0"));
     }
