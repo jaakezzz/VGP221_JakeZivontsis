@@ -302,3 +302,41 @@ void AFPSCharacter::AddEnemyKill()
     EnemiesKilled++;
     UE_LOG(LogTemp, Log, TEXT("Enemy Killed! Total: %d"), EnemiesKilled);
 }
+
+void AFPSCharacter::StartFlashlightGlitch()
+{
+    // Prevent the trigger box from starting multiple overlapping loops if they touch it twice
+    if (bIsFlashlightGlitching) return;
+
+    bIsFlashlightGlitching = true;
+
+    // Start the unpredictable loop
+    QueueNextFlicker();
+}
+
+void AFPSCharacter::QueueNextFlicker()
+{
+    // Pick a random time between 3 and 10 seconds
+    float RandomDelay = FMath::RandRange(3.0f, 10.0f);
+
+    // Start the timer to execute the first ghost button press
+    GetWorldTimerManager().SetTimer(FlickerTimerHandle, this, &AFPSCharacter::FirstFlicker, RandomDelay, false);
+}
+
+void AFPSCharacter::FirstFlicker()
+{
+    // First ghost press
+    ToggleFlashlight();
+
+    // Wait exactly 0.15 seconds, then press again
+    GetWorldTimerManager().SetTimer(FlickerTimerHandle, this, &AFPSCharacter::SecondFlicker, 0.15f, false);
+}
+
+void AFPSCharacter::SecondFlicker()
+{
+    // Second ghost press
+    ToggleFlashlight();
+
+    // Restart the random waiting period
+    QueueNextFlicker();
+}

@@ -136,6 +136,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Combat")
     void AddReserveAmmo(int32 AmmoAmount);
 
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    void StartFlashlightGlitch();
+
     UFUNCTION(BlueprintCallable, Category = "Stats")
     void AddCollectible();
 
@@ -162,4 +165,15 @@ public:
  private:
     float LastHurtSoundTime = -100.0f;
     float LastHealSoundTime = -100.0f;
+
+	// --- Flashlight Glitching ---
+    bool bIsFlashlightGlitching = false;
+
+    // The timer handle that will run the unpredictable loop
+    FTimerHandle FlickerTimerHandle;
+
+    // The three steps of the ghost-toggle loop
+    void QueueNextFlicker();
+    void FirstFlicker();
+    void SecondFlicker();
 };
